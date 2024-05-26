@@ -8,9 +8,8 @@ const path = require('path');
 const client = new Client({
     puppeteer: {
         executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        headless: false, // Ejecutar en modo no headless para depurar visualmente
+        headless: true, // Ejecutar en modo no headless para depurar visualmente
         args: ['--no-sandbox', '--disable-setuid-sandbox'], // Agregar opciones para mayor compatibilidad
-        timeout: 60000 // Aumentar el tiempo de espera a 60 segundos
     }
 });
 
@@ -32,7 +31,7 @@ client.once('ready', async () => {
 
             for (const row of contacts) {
                 const chatId = `${row.number}@c.us`; // Asumiendo que la columna se llama 'number'
-                const message = `¡Hola ${row.name}! Este es un mensaje automático.`;
+                const message = `¡Hola! Tenemos un mensaje importante para ti.`;
 
                 try {
                     // Enviar mensaje de texto
