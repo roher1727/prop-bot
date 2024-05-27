@@ -43,7 +43,7 @@ client.once('ready', async () => {
                     }
                     
                     // Ruta del video a enviar
-                    const videoPath = path.join(__dirname, 'videos', video_name); // Reemplaza 'video_demo.mp4' con el nombre del archivo de video
+                    const videoPath = path.join(__dirname, 'videos', process.argv[3]); // Reemplaza 'video_demo.mp4' con el nombre del archivo de video
 
                     // Verificar el tamaño del archivo de video
                     const stats = fs.statSync(videoPath);
