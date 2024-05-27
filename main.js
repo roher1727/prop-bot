@@ -17,9 +17,17 @@ const client = new Client({
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Función para generar un retraso aleatorio entre minDelay y maxDelay milisegundos
+const randomDelay = (minDelay, maxDelay) => {
+    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    return new Promise(resolve => setTimeout(resolve, delay));
+};
+
+
 // Cuando el cliente esté listo, ejecutar este código (solo una vez)
 client.once('ready', async () => {
     console.log('Client is ready!');
+    const counter = 0;
     const contacts = [];
     // const video_names = ['video_1.mp4','video_2.mp4','video_3.mp4'];
     // Leer el archivo CSV y enviar mensajes a cada número
@@ -57,18 +65,17 @@ client.once('ready', async () => {
 
                         // Enviar video
                         await client.sendMessage(chatId, media);
-                        console.log(`Video enviado con éxito a ${row.number}`);
+                        console.log(`${counter}: Video enviado con éxito a ${row.number}`);
                     } else {
                         console.log(`El video es demasiado grande para enviar a ${row.number}`);
                     }
-                    
-
+                    counter++;
                 } catch (err) {
                     console.error(`Error al enviar el mensaje o video a ${row.number}:`, err);
                 }
 
                 // Agregar un retraso de 2 segundos entre mensajes
-                await delay(2000);
+                await randomDelay(1000, 7000);
             }
 
             console.log('Todos los mensajes y videos han sido enviados');
