@@ -2,3 +2,5 @@
 *.csv
 node_modules/
 videos/
+output_videos/
+.wwebjs_cache/
