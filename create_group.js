@@ -1,8 +1,7 @@
-const { Client, MessageMedia } = require('whatsapp-web.js');
+const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const csv = require('csv-parser');
-const path = require('path');
 const process = require('process');
 
 // Crear una nueva instancia del cliente
@@ -14,14 +13,6 @@ const client = new Client({
         timeout: 60000 // Aumentar el tiempo de espera a 60 segundos
     }
 });
-
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Función para generar un retraso aleatorio entre minDelay y maxDelay milisegundos
-const randomDelay = (minDelay, maxDelay) => {
-    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-    return new Promise(resolve => setTimeout(resolve, delay));
-};
 
 // Leer contactos desde el archivo CSV
 const readContacts = async (filePath) => {
@@ -39,17 +30,16 @@ const readContacts = async (filePath) => {
     });
 };
 
-// Crear grupo y añadir contactos
+// Crear grupo y añadir todos los contactos
 const createGroupAndAddContacts = async (groupName, contacts) => {
-    // Máximo 250 contactos por grupo en WhatsApp
-    const maxContacts = 250;
-    const chatIds = contacts.slice(0, maxContacts).map(contact => `${contact.number}@c.us`);
-
+    const chatIds = contacts.map(contact => `${contact.number}@c.us`);
+    console.log(chatIds);
     try {
         // Asegurarse de que la página esté completamente cargada
         // await client.pupPage.waitForSelector('canvas', { timeout: 60000 });
 
         // Crear el grupo
+        console.log("Creando grupo");
         const group = await client.createGroup(groupName, chatIds);
         console.log(`Grupo creado: ${groupName}`);
         console.log(`Participantes añadidos: ${chatIds.length}`);
@@ -57,39 +47,6 @@ const createGroupAndAddContacts = async (groupName, contacts) => {
     } catch (error) {
         console.error('Error al crear el grupo:', error);
         throw error;
-    }
-};
-
-// Enviar video al grupo
-const sendVideoToGroup = async (groupId, videoPath) => {
-    const media = MessageMedia.fromFilePath(videoPath);
-    try {
-        await client.sendMessage(groupId, media);
-        console.log('Video enviado al grupo con éxito');
-    } catch (error) {
-        console.error('Error al enviar el video:', error);
-        throw error;
-    }
-};
-
-// Crear múltiples grupos y enviar video a cada grupo
-const createGroupsAndSendVideos = async (contacts, groupNamePrefix, videoPath) => {
-    let groupIndex = 1;
-    while (contacts.length > 0) {
-        const groupName = `${groupNamePrefix} ${groupIndex}`;
-        const groupContacts = contacts.splice(0, 250); // Extraer los primeros 250 contactos
-
-        // Crear el grupo y añadir contactos
-        const groupId = await createGroupAndAddContacts(groupName, groupContacts);
-
-        // Enviar video al grupo
-        await sendVideoToGroup(groupId, videoPath);
-
-        // Aumentar el índice del grupo
-        groupIndex++;
-
-        // Agregar un retraso aleatorio entre la creación de grupos
-        await randomDelay(2000, 5000); // Retraso aleatorio entre 2 y 5 segundos
     }
 };
 
@@ -101,11 +58,9 @@ client.once('ready', async () => {
     const contacts = await readContacts(process.argv[2]);
     console.log('Todos los contactos han sido leídos');
 
-    // Ruta del video a enviar
-    const videoPath = path.join(__dirname, 'videos', process.argv[3]); // Reemplaza 'video_demo.mp4' con el nombre del archivo de video
-
-    // Crear grupos y enviar videos
-    await createGroupsAndSendVideos(contacts, 'Esperanza de Mexico', videoPath);
+    // Crear el grupo y añadir contactos
+    const groupName = 'Nombre del Grupo'; // Reemplaza con el nombre del grupo deseado
+    await createGroupAndAddContacts(groupName, contacts);
 });
 
 // Manejar el evento de navegación para evitar la destrucción del contexto de ejecución
