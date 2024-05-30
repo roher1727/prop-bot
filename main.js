@@ -161,9 +161,9 @@ client.once('ready', async () => {
                     }
                     
                     // Obtener un video aleatorio de la carpeta "videos"
-                    const videoName = await getRandomVideo(path.join(__dirname, 'output_videos'));
+                    const videoName = await getRandomVideo(path.join(__dirname, 'videos'));
                     console.log(videoName);
-                    const videoPath = path.join(__dirname, 'output_videos', videoName);
+                    const videoPath = path.join(__dirname, 'videos', videoName);
 
                     // Verificar el tamaño del archivo de video
                     const stats = fs.statSync(videoPath);

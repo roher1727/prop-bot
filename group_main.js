@@ -39,24 +39,33 @@ const readContacts = async (filePath) => {
     });
 };
 
-// Crear grupo y añadir contactos
+
 const createGroupAndAddContacts = async (groupName, contacts) => {
-    // Máximo 250 contactos por grupo en WhatsApp
     const maxContacts = 250;
     const chatIds = contacts.slice(0, maxContacts).map(contact => `${contact.number}@c.us`);
+    //console.log(chatIds);
 
-    try {
-        // Asegurarse de que la página esté completamente cargada
-        // await client.pupPage.waitForSelector('canvas', { timeout: 60000 });
+    const retryOptions = {
+        retries: 3,
+        delay: 2000 // Esperar 2 segundos entre reintentos
+    };
 
-        // Crear el grupo
-        const group = await client.createGroup(groupName, chatIds);
-        console.log(`Grupo creado: ${groupName}`);
-        console.log(`Participantes añadidos: ${chatIds.length}`);
-        return group.gid._serialized; // Retornar el ID del grupo
-    } catch (error) {
-        console.error('Error al crear el grupo:', error);
-        throw error;
+    for (let attempt = 1; attempt <= retryOptions.retries; attempt++) {
+        try {
+            console.log("Creando grupo");
+            const group = await client.createGroup(groupName, chatIds);
+            console.log(`Grupo creado: ${groupName}`);
+            console.log(`Participantes añadidos: ${chatIds.length}`);
+            return group.gid._serialized; // Retornar el ID del grupo
+        } catch (error) {
+            if (attempt < retryOptions.retries) {
+                console.error(`Error al crear el grupo (Intento ${attempt}): ${error.message}. Reintentando...`);
+                await new Promise(resolve => setTimeout(resolve, retryOptions.delay));
+            } else {
+                console.error('Error al crear el grupo:', error);
+                throw error;
+            }
+        }
     }
 };
 
