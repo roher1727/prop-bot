@@ -59,6 +59,18 @@ const createGroupAndAddContacts = async (groupName, contacts) => {
     }
 };
 
+// Enviar video al grupo
+const sendVideoToGroup = async (groupId, videoPath) => {
+    const media = MessageMedia.fromFilePath(videoPath);
+    try {
+        await client.sendMessage(groupId, media);
+        console.log('Video enviado al grupo con éxito');
+    } catch (error) {
+        console.error('Error al enviar el video:', error);
+        throw error;
+    }
+};
+
 // Cuando el cliente esté listo, ejecutar este código (solo una vez)
 client.once('ready', async () => {
     console.log('Client is ready!');
@@ -69,7 +81,12 @@ client.once('ready', async () => {
 
     // Crear el grupo y añadir contactos
     const groupName = 'Esperanza de Mexico'; // Reemplaza con el nombre del grupo deseado
-    await createGroupAndAddContacts(groupName, contacts);
+    const groupId = await createGroupAndAddContacts(groupName, contacts);
+
+    const videoPath = path.join(__dirname, 'videos', process.argv[3]); // Reemplaza 'video_demo.mp4' con el nombre del archivo de video
+
+    await sendVideoToGroup(groupId, videoPath);
+
 });
 
 // Manejar el evento de navegación para evitar la destrucción del contexto de ejecución
